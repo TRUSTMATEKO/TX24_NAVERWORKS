@@ -63,7 +63,7 @@ NLB_CONFIG="${CONF_DIR}/nlb.json"
 # DB_CONFIG="${CONF_DIR}/db.json"
 
 #EXECUTOR_THRESHOLD_WARN="true"
-#EXECUTOR_THRESHOLD_MILLIES=5000
+#EXECUTOR_THRESHOLD_MILLIES="5000""
 
 #==============================================================================
 # Java 설정
