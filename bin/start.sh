@@ -202,7 +202,7 @@ start_application() {
     
     cd "$BIN_DIR" || exit 1
     
-    nohup $JAVA $PRG_OPTS $JVM_OPTS -cp "$CLASSPATH" $MAIN_CLASS > /dev/null 2>&1 &
+    nohup $JAVA $PRG_OPTS $JVM_OPTS -cp "$CLASSPATH" $MAIN_CLASS &
     local pid=$!
     
     echo "$pid" > "$PID_FILE"
