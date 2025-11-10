@@ -143,10 +143,10 @@ check_process() {
     
     # 실행 중인 프로세스 확인
     local running_proc
-    running_proc=$(ps -ef | grep java | grep "$PROC_NAME" | grep -v grep)
-    if [ -n "$running_proc" ]; then
+    running_proc_count=$(ps -ef | grep "[j]ava" | grep -c "$PROC_NAME" || true)
+    if [ "$running_proc_count" -gt 0 ]; then
         echo "Error: Process is already running"
-        echo "$running_proc"
+        ps -ef | grep "[j]ava" | grep "$PROC_NAME"
         exit 1
     fi
 }
