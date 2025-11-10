@@ -224,10 +224,12 @@ start_application() {
 main() {
     
     # verbose 옵션 확인
-    if [ "$1" = "-v" ] || [ "$1" = "--verbose" ]; then
-        print_options
-        shift
-    fi
+    #if [ "$1" = "-v" ] || [ "$1" = "--verbose" ]; then
+    #    print_options
+    #    shift
+    #fi
+    
+    print_options
     
     check_process
     

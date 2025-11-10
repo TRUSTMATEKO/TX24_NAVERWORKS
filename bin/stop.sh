@@ -62,7 +62,6 @@ main() {
     
     # 강제 종료
     echo "Stopping $PROC_NAME (PID: $pid)..."
-    echo "Force killing process..."
     
     kill -9 "$pid" 2>/dev/null
     
