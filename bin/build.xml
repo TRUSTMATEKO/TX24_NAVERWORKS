@@ -32,7 +32,7 @@
 			optimize="true" debug="true" deprecation="true" encoding="utf-8" includeantruntime="false" release="17">
 			<classpath refid="project.classpath"/>
 		</javac>
-		<jar destfile="${lib}\tx24_naverworks.jar" basedir="${classes.dir}" includes="kr/tx24/**">
+		<jar destfile="${lib.dir}\tx24_naverworks.jar" basedir="${classes.dir}" includes="kr/tx24/**">
 			<manifest>
 				<attribute name="Built-By" value="TX24"/>
 				<attribute name="Jar-Title" value="Tx24 Core Library"/>
