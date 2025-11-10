@@ -161,9 +161,9 @@ main() {
     # 명령행 인자 파싱
     parse_arguments "$@"
     
-    echo "=============================================="
-    echo " $PROC_NAME Stop Script"
-    echo "=============================================="
+    echo ""
+    echo "Stop $PROC_NAME"
+    echo ""
     
     # PID 파일 확인
     if [ ! -f "$PID_FILE" ]; then
@@ -224,7 +224,7 @@ main() {
         fi
     fi
     
-    echo "=============================================="
+    echo ""
     exit $exit_code
 }
 

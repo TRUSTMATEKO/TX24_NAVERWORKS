@@ -210,6 +210,7 @@ start_application() {
     sleep 2
     if ps -p "$pid" > /dev/null 2>&1; then
         echo "Started successfully (PID: $pid)"
+        echo ""
         return 0
     else
         echo "Failed to start"
