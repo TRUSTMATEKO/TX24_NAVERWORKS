@@ -1,0 +1,59 @@
+{
+  "host" : "0.0.0.0",
+  "port" : 10103,
+  "logging" : false,
+  "basePackage" : "kr.tx24.naverworks.ctl",
+  "property" : {
+    "proc" : "NAVERWORKS"
+  },
+  "oauth": {
+    "clientId": "kHIXP3EhyF89TNwaaQUx",
+    "clientSecret": "nzkkkJRGvJ",
+    "serviceAccount": "cbw9d.serviceaccount@tx24.kr",
+    "privateKey": [
+    "-----BEGIN PRIVATE KEY-----",
+    "MIIEugIBADANBgkqhkiG9w0BAQEFAASCBKQwggSgAgEAAoIBAQC+APTvKZ0uydnN",
+    "cqsYFj6xS3A0FjdIh1WZszLdhs304Eu+K2Iubuv3/0GshX0v96tv8nk02purTIi6",
+    "VSMsFpNBYVbQAzRp9lgZnynetAg+UEO7Lk4QJzfMTkeQMPmdCZXjyoOoPaOAprAI",
+    "21e9gYptWlfFu9aJtzc/TQHFtHEjdil0ZcU8yL0GxequihR4rGwLJccLg6Fqi97k",
+    "xXvZPzJf7peRnlEhW+9x98LEQQoFXWyNkFT7SYDyU/80x3bKlXm8zF+mi3zRcrBB",
+    "nz1819rPfMxJRfBgfJDvl+hmsluGLDzgBGZ31EB4ooerDjDq96F2sSh7Df+Ghyzn",
+    "oR1Zq6QlAgMBAAECgf8DDZ/HgHjgL8SV9u3lKiip14gU8mKxet/kYoyw6CQGBLnD",
+    "ox6AqxuAuPtWEeJ/O/1kmw09FXXkwDOqw830nGEyZEKtAZ+8ZWKAoIADzKMF05yk",
+    "H6T1WmcgUzinCYOKHdh2Bnj647wO+kLvGDtt2Bqzc/RIGkHrulnYmAW91XqQQMem",
+    "p5yEPhM9kawSHuvtCKxUk/xf0ym7XbRPYRBGb1OmDOT5qypTnamWC2SIKXyxyIEl",
+    "6r71XaspnmQKmBkWe40RROWO5t1CSaMadvdUE/X1VQPoIY3mNx8aAv/9TbVIDfPJ",
+    "4h0hoJrqAT1mzfD8W7P5Ori4X+hL9TcsC+6vsMECgYEA9RUkJ9zGmPUegN3idii0",
+    "BZm4TsVFRECehYUlC/OzaGMYdO0jqKOCY8gB8/TDSKC3VEL5nkDuHOAeubv0PWuq",
+    "u3PDauvJBEEhpJpPBTPuLW5LI3jt0R3LKpQi5SeIHNMGpuB0k81xrswWkTe2HJe/",
+    "rXOBclzX21HZIfVQX2ThHUUCgYEAxne15mcrpCmDOCDreRKUrOexxXveRGNYUWsr",
+    "Ml2Yi+0X6GWLcaO2msa2G2KB8ISJ1cBZEb0N9UpcOV0CV61fokbr2zWYFbjcIJkJ",
+    "X40yPC4jNYY3/1R2mTvHGetCNp656Lh3o9W+tzjohq5jJCseQaWKyOtgaZVB/Ugl",
+    "VcQpqWECgYA/BB+WzFKYM7aTJfo7rX2UTxEv19NWmFLqO/DpoNDJj2lTb0IS82/s",
+    "Xhn6cz3fJ8vbs5jhUwqmjA36bdSAEnYE2uAtVtEJ8gFHhJG64b5lGg3h4g8sDMAX",
+    "g51xVHfQCYaVU/NFqbaIXluTHUMLGQ2k+KUZFbw+3U26SIxQ6uxjDQKBgE/sdXxL",
+    "n++EKCu6VhlzuhvHUnfM4j14JGDlX4fw2TXATRhxjC4/V5IM49kzWlCZj0hdJYFX",
+    "OP/G6kzPf9n/H7wiA2lLs+tLfppCBtxL6CcEDXnIi1RvlzMuN4fgjdGhKgzl/Igl",
+    "05/Fcx6Jq7MtCgo1uCYhY7ohOWneW+qmDIEBAoGATa0fODtMVEEnUHY9hrAIpcGQ",
+    "uTwjao5PZHQR++137dYJ0T1zQsgHK6qPHPfnd7LkKxUanacTizw1fz6NToprh9Yh",
+    "2XLttJVnAiK37+D6Jsr/BbwlvWe+uyT/FKYsqXcQpJTsccsPeSNTvbmY/ToQN2DY",
+    "kXiMRdKZDGCsUZMPp8c=",
+    "-----END PRIVATE KEY-----"],
+    "scope": "bot",
+    "tokenServer": "https://auth.worksmobile.com/oauth2/v2.0/token",
+    "refreshBeforeExpireMinutes": 10,
+    "autoRefresh": true,
+    "maxRetryCount": 3
+  },
+  "api": {
+    "baseUrl": "https://www.worksapis.com",
+    "version": "v1.0",
+    "connectTimeout": 30000,
+    "readTimeout": 30000
+  },
+  "bot": {
+    "botId": "11085650",
+    "botName": "업무안내",
+    "defaultChannelId": "89fcf9bb-69bc-fe1a-0494-8f5b9519ec09"
+  }
+}

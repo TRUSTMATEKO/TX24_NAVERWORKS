@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk17.0.11_9">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/guava-33.4.8-jre.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-2.20.0-fat.jar"/>
+	<classpathentry kind="lib" path="lib/jjwt-0.13.0-fat.jar"/>
+	<classpathentry kind="lib" path="lib/lettuce-core-6.8.1.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/netty-4.2.6-fat.jar"/>
+	<classpathentry kind="lib" path="lib/okhttp-5.3.0-fat.jar"/>
+	<classpathentry kind="lib" path="lib/reactive-streams-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/reactor-core-3.7.11.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-2.0.17_logback-1.5.18-fat.jar"/>
+	<classpathentry kind="lib" path="lib/tx24_inet_2511.jar"/>
+	<classpathentry kind="lib" path="lib/tx24_lib_2511.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>
