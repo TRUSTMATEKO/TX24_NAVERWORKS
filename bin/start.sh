@@ -62,6 +62,9 @@ LOG_REDIS_HOST="127.0.0.1:6379/0"
 NLB_CONFIG="${CONF_DIR}/nlb.json"
 # DB_CONFIG="${CONF_DIR}/db.json"
 
+#EXECUTOR_THRESHOLD_WARN="true"
+#EXECUTOR_THRESHOLD_MILLIES=5000
+
 #==============================================================================
 # Java 설정
 #==============================================================================
@@ -118,10 +121,50 @@ PRG_OPTS=""
 [ -n "$NLB_CONFIG" ] && PRG_OPTS="${PRG_OPTS} -DNLB=${NLB_CONFIG}"
 [ -n "$DB_CONFIG" ] && PRG_OPTS="${PRG_OPTS} -DDBSET=${DB_CONFIG}"
 
+# 설정 파일 옵션 Async 실행 지연에 대한 경고 적용 
+[ -n "$EXECUTOR_THRESHOLD_WARN" ] && PRG_OPTS="${PRG_OPTS} -Dasync.threshold.warn=${EXECUTOR_THRESHOLD_WARN}"
+[ -n "$EXECUTOR_THRESHOLD_MILLIES" ] && PRG_OPTS="${PRG_OPTS} -Dasync.threshold.millies=${EXECUTOR_THRESHOLD_MILLIES}"
+
+
+# AsyncExcutor 옵션
+
+
 #==============================================================================
 # Classpath 구성
 #==============================================================================
 CLASSPATH="${LIB_DIR}/*:${CLASSES_DIR}"
+
+
+
+
+#==============================================================================
+# 옵션 출력 함수
+#==============================================================================
+print_options() {
+    echo ""
+    echo "JVM Options:"
+    if [ -n "$JVM_OPTS" ]; then
+        # 공백을 기준으로 라인별 출력
+        echo "$JVM_OPTS" | tr ' ' '\n' | grep -v '^$' | while read -r opt; do
+            echo "  $opt"
+        done
+    else
+        echo "  (none)"
+    fi
+    
+    echo ""
+    echo "Program Options:"
+    if [ -n "$PRG_OPTS" ]; then
+        # 공백을 기준으로 라인별 출력
+        echo "$PRG_OPTS" | tr ' ' '\n' | grep -v '^$' | while read -r opt; do
+            echo "  $opt"
+        done
+    else
+        echo "  (none)"
+    fi
+    echo ""
+}
+
 
 #==============================================================================
 # 프로세스 확인
@@ -179,6 +222,13 @@ start_application() {
 # Main
 #==============================================================================
 main() {
+    
+    # verbose 옵션 확인
+    if [ "$1" = "-v" ] || [ "$1" = "--verbose" ]; then
+        print_options
+        shift
+    fi
+    
     check_process
     
     if ! start_application; then
