@@ -1,1 +1,3 @@
 /classes/
+/logs/
+/bin/*.pid
