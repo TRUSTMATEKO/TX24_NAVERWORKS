@@ -224,7 +224,7 @@ main() {
         fi
     fi
     
-    echo ""
+    echo "" 
     exit $exit_code
 }
 
