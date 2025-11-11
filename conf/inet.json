@@ -46,7 +46,7 @@
     "maxRetryCount": 3
   },
   "api": {
-    "baseUrl": "https://www.worksapis.com",
+    "baseUrl": "https://www.worksapis.com/v1.0",
     "version": "v1.0",
     "connectTimeout": 30000,
     "readTimeout": 30000
