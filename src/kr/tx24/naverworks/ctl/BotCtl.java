@@ -129,13 +129,14 @@ public class BotCtl {
     	this.ctx = ctx;
     	this.inet = inet;
     	
-    	BotService svc = null;
-    	try{
-    		svc = new BotService();
-    	}catch(Exception e) {
-    		logger.error("Failed to Initialize Bot Service : {}",CommonUtils.getExceptionMessage(e));
-    	}
-    	this.botService = svc;
+    	// 싱글톤 인스턴스 사용
+        BotService svc = null;
+        try {
+            svc = BotService.getInstance();  // ✅ 싱글톤 인스턴스 가져오기
+        } catch(Exception e) {
+            logger.error("Failed to get Bot Service instance: {}", CommonUtils.getExceptionMessage(e));
+        }
+        this.botService = svc;
     	this.resInet 	= new INet()
 		        .head("result"  , true)
 		        .head("message" , "successful");

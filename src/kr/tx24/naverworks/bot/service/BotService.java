@@ -21,70 +21,94 @@ import okhttp3.Response;
 
 public class BotService {
 
-	
-	 private static final Logger logger = LoggerFactory.getLogger(BotService.class);
-	 private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-	 
-	 
-	 private final LinkedMap<String,Object> apiMap;
-	 private final TokenManager tokenManager;
-	 
-	 private final OkHttpClient httpClient;
-	 private final JacksonUtils json;
-	    
-	 public BotService() throws Exception{
-		 this.apiMap 		= INetConfigLoader.getMap("api",TypeRegistry.MAP_LINKEDMAP_OBJECT);
-		 this.tokenManager = new TokenManager(INetConfigLoader.getMap("oauth",TypeRegistry.MAP_LINKEDMAP_OBJECT));
+    private static final Logger logger = LoggerFactory.getLogger(BotService.class);
+    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    
+    // 싱글톤 인스턴스
+    private static volatile BotService instance;
+    private static final Object lock = new Object();
+    
+    private final LinkedMap<String,Object> apiMap;
+    private final TokenManager tokenManager;
+    private final OkHttpClient httpClient;
+    private final JacksonUtils json;
+    
+    /**
+     * Private 생성자 (싱글톤 패턴)
+     */
+    private BotService() throws Exception {
+        this.apiMap = INetConfigLoader.getMap("api", TypeRegistry.MAP_LINKEDMAP_OBJECT);
+        this.tokenManager = new TokenManager(INetConfigLoader.getMap("oauth", TypeRegistry.MAP_LINKEDMAP_OBJECT));
 
-		 this.httpClient	= new OkHttpClient.Builder()
-	                	.connectTimeout(apiMap.getLong("connectTimeout", 5*1000), TimeUnit.MILLISECONDS)
-	                	.readTimeout(apiMap.getLong("readTimeout", 30*1000), TimeUnit.MILLISECONDS)
-	                	.build();
-		 this.json = new JacksonUtils();
-		 
-		 this.tokenManager.initialize();
-		 logger.info("BotApiService initialized");
-	 }
-	 
-	 public String sendMessage(BotMessage message) throws Exception {
-	        
-	        // API URL 생성
-	        String url = String.format("%s/bots/%s/channels/%s/messages",
-	                apiMap.getString("baseUrl"),
-	                message.botId(),
-	                message.channelId());
-	        
-	        // Request Body 생성
-	        Map<String, Object> requestBody = new HashMap<>();
-	        requestBody.put("content", message.getContent());
-	        String payload = json.toJson(requestBody);
-	        
-	        logger.debug("message to: {}", url);
-	        logger.debug("request   : {}", payload);
-	        
-	        // HTTP 요청
-	        Request request = new Request.Builder()
-	                .url(url)
-	                .post(RequestBody.create(payload, JSON))
-	                .addHeader("Authorization", "Bearer " + tokenManager.getAccessToken())
-	                .addHeader("Content-Type", "application/json")
-	                .build();
-	        
-	        try (Response response = httpClient.newCall(request).execute()) {
-	            String responseBody = response.body() != null ? response.body().string() : "";
-	            
-	            if (!response.isSuccessful()) {
-	                logger.warn("Message send failed: code={}, body={}", response.code(), responseBody);
-	                throw new Exception("메시지 전송 실패: " + response.code() + ", " + responseBody);
-	            }
-	            
-	            logger.info("response : {}", responseBody);
-	            return responseBody;
-	        }
-	    }
-	 
-	 
-	 
-	 
-	 
+        this.httpClient = new OkHttpClient.Builder()
+                .connectTimeout(apiMap.getLong("connectTimeout", 5*1000), TimeUnit.MILLISECONDS)
+                .readTimeout(apiMap.getLong("readTimeout", 30*1000), TimeUnit.MILLISECONDS)
+                .build();
+        this.json = new JacksonUtils();
+        
+        // TokenManager 초기화 (한 번만 실행됨)
+        this.tokenManager.initialize();
+        logger.info("BotService initialized (singleton)");
+    }
+    
+    /**
+     * 싱글톤 인스턴스 반환 (Double-Checked Locking)
+     */
+    public static BotService getInstance() throws Exception {
+        if (instance == null) {
+            synchronized (lock) {
+                if (instance == null) {
+                    instance = new BotService();
+                }
+            }
+        }
+        return instance;
+    }
+    
+    /**
+     * 메시지 전송
+     */
+    public String sendMessage(BotMessage message) throws Exception {
+        
+        // API URL 생성
+        String url = String.format("%s/bots/%s/channels/%s/messages",
+                apiMap.getString("baseUrl"),
+                message.botId(),
+                message.channelId());
+        
+        // Request Body 생성
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("content", message.getContent());
+        String payload = json.toJson(requestBody);
+        
+        logger.debug("message to: {}", url);
+        logger.debug("request   : {}", payload);
+        
+        // HTTP 요청 (getAccessToken()은 캐시된 토큰을 반환하거나 필요시에만 갱신)
+        Request request = new Request.Builder()
+                .url(url)
+                .post(RequestBody.create(payload, JSON))
+                .addHeader("Authorization", "Bearer " + tokenManager.getAccessToken())
+                .addHeader("Content-Type", "application/json")
+                .build();
+        
+        try (Response response = httpClient.newCall(request).execute()) {
+            String responseBody = response.body() != null ? response.body().string() : "";
+            
+            if (!response.isSuccessful()) {
+                logger.warn("Message send failed: code={}, body={}", response.code(), responseBody);
+                throw new Exception("메시지 전송 실패: " + response.code() + ", " + responseBody);
+            }
+            
+            logger.info("response : {}", responseBody);
+            return responseBody;
+        }
+    }
+    
+    /**
+     * TokenManager 정보 조회 (디버깅용)
+     */
+    public String getTokenInfo() {
+        return tokenManager.getTokenInfo();
+    }
 }
