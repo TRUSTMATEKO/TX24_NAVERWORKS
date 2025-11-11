@@ -45,6 +45,7 @@ public class TokenManager {
                 .readTimeout(10000, TimeUnit.MILLISECONDS)
                 .build();
         
+        
         logger.info("TokenManager initialized for service account: {}", oauthMap.getString("serviceAccount"));
     }
     

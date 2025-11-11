@@ -42,6 +42,7 @@ public class BotService {
 	                	.build();
 		 this.json = new JacksonUtils();
 		 
+		 this.tokenManager.initialize();
 		 logger.info("BotApiService initialized");
 	 }
 	 
