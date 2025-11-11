@@ -5,6 +5,7 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,10 @@ public class JwtBuilder {
     
     public JwtBuilder(LinkedMap<String,Object> oauthMap) throws Exception {
         this.oauthMap = oauthMap;
-        this.privateKey = parsePrivateKey(oauthMap.getString("privateKey"));
+        @SuppressWarnings("unchecked")
+        List<String> privateKeyLines = (List<String>) oauthMap.get("privateKey");
+        String privateKeyPem = String.join("\n", privateKeyLines);
+        this.privateKey = parsePrivateKey(privateKeyPem);
     }
     
     /**
