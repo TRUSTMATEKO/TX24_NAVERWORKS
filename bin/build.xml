@@ -1,45 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="../../TX24_NAVERWORKS" default="compile" name="LNK1P">
-	
-	<!-- Project Default Directory -->
-	<property name="src.dir" location="${basedir}\src"/>
-	<property name="lib.dir" location="${basedir}\lib"/>
-	<property name="classes.dir" location="${basedir}\classes"/>
-	<property name="conf.dir" location="${basedir}\conf"/>
-	
-	<!-- Project Default Classpath -->
-	<path id="project.classpath">
-		<fileset dir="${lib.dir}">
-			<include name="*.jar"/>
-		</fileset>
-	</path>
+<project basedir="../../TX24_NAVERWORKS" default="build" name="LNK1P">
+    
+    <!-- ========================================================================
+         Build 설정
+         - 기본: ant build                     -> classes로 컴파일만
+         - 배포: ant build -Dproduction=true   -> fat-jar 생성 (dist 디렉토리)
+         ======================================================================== -->
+    
+    <!-- Project Directory -->
+    <property name="src.dir" location="${basedir}/src"/>
+    <property name="lib.dir" location="${basedir}/lib"/>
+    <property name="classes.dir" location="${basedir}/classes"/>
+    <property name="dist.dir" location="${basedir}/dist"/>
+    
+    <!-- Fat JAR 설정 - 여기서 이름과 Main Class 지정 -->
+    <property name="fat.jar.name" value="TX24_NAVERWORKS.jar"/>
+    <property name="main.class" value="kr.tx24.inet.server.INetServer"/>
+    
+    <!-- Build Mode -->
+    <property name="production" value="false"/>
+    
+    <!-- Project Classpath -->
+    <path id="project.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
 
-	<echo message ="#### SET PROJECT CLASSPATH ####"/>
+    <!-- ========================================================================
+         초기화
+         ======================================================================== -->
+    <target name="init">
+        <tstamp>
+            <format property="time" pattern="yyyy-MM-dd HH:mm:ss"/>
+            <format property="jardate" pattern="yyMM"/>
+        </tstamp>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        
+        <echo message="TX24 Build System"/>
+        <echo message="Build Mode: ${production}"/>
+        <echo message="Timestamp: ${time}"/>
+    </target>
 
-	<!-- Make Directory -->
-	<target name="init">
-		<tstamp>
-			<format property="time" pattern="yyyy-MM-dd hh:mm:ss" />
-			<format property="jardate" pattern="yyMM" />
-		</tstamp>
-		<mkdir dir="${basedir}\classes"/>
-	</target>
+    <!-- ========================================================================
+         컴파일
+         ======================================================================== -->
+    <target name="compile" depends="init">
+        <echo message="Compiling source files..."/>
+        <javac destdir="${classes.dir}" 
+               srcdir="${src.dir}" 
+               includes="kr/tx24/**"  
+               optimize="true" 
+               debug="true" 
+               deprecation="true" 
+               encoding="utf-8" 
+               includeantruntime="false" 
+               release="17">
+            <classpath refid="project.classpath"/>
+        </javac>
+        <echo message="Compilation completed successfully"/>
+    </target>
 
-	<echo message ="#### COMPILE COMPLETE ####"/>
+    <!-- ========================================================================
+         Fat JAR 생성 (production=true 일 때만)
+         ======================================================================== -->
+    <target name="package" depends="compile" if="production">
+        <echo message="Creating Fat JAR for Production"/>
+        <echo message="Output: ${dist.dir}/${fat.jar.name}"/>
+        <echo message="Main-Class: ${main.class}"/>
+        
+        <!-- Fat JAR 생성 -->
+        <jar destfile="${dist.dir}/${fat.jar.name}" duplicate="preserve">
+            <!-- 컴파일된 클래스 파일 포함 -->
+            <fileset dir="${classes.dir}">
+                <include name="kr/tx24/**"/>
+            </fileset>
+            
+            <!-- 모든 의존성 라이브러리 포함 -->
+            <zipgroupfileset dir="${lib.dir}">
+                <include name="*.jar"/>
+                <!-- 서명된 JAR 파일의 서명 제거 -->
+                <exclude name="META-INF/*.SF"/>
+                <exclude name="META-INF/*.DSA"/>
+                <exclude name="META-INF/*.RSA"/>
+            </zipgroupfileset>
+            
+            <!-- Manifest 설정 -->
+            <manifest>
+                <attribute name="Built-By" value="TX24"/>
+                <attribute name="Jar-Title" value="TX24 NAVER WORKS Application"/>
+                <attribute name="Jar-Version" value="${jardate}"/>
+                <attribute name="Last-Updated-Date" value="${time}"/>
+                <attribute name="Main-Class" value="${main.class}"/>
+                <attribute name="Implementation-Version" value="${jardate}"/>
+            </manifest>
+        </jar>
+        
+        <echo message="Fat JAR created successfully!"/>
+        <echo message="Location: ${dist.dir}/${fat.jar.name}"/>
+    </target>
 
-	<target name="compile" depends="init">
-		<javac destdir="${basedir}\classes" srcdir="${src.dir}" includes="kr/tx24/**"  
-			optimize="true" debug="true" deprecation="true" encoding="utf-8" includeantruntime="false" release="17">
-			<classpath refid="project.classpath"/>
-		</javac>
-		<jar destfile="${lib.dir}\tx24_naverworks.jar" basedir="${classes.dir}" includes="kr/tx24/**">
-			<manifest>
-				<attribute name="Built-By" value="TX24"/>
-				<attribute name="Jar-Title" value="Tx24 Core Library"/>
-				<attribute name="Jar-Version" value="${jardate}"/>
-				<attribute name="Last-Updated-Date" value="${time}"/>
-			</manifest>
-		</jar>
-		
-	</target>
+    <!-- ========================================================================
+         기본 빌드 타겟
+         - production=false (기본): compile만 실행
+         - production=true: compile + fat-jar 생성
+         ======================================================================== -->
+    <target name="build" depends="compile,package">
+        <echo message="Build Complete"/>
+        <condition property="build.result" 
+                   value="Fat JAR created in ${dist.dir}/${fat.jar.name}" 
+                   else="Classes compiled to ${classes.dir}">
+            <istrue value="${production}"/>
+        </condition>
+        <echo message="${build.result}"/>
+    </target>
+
+    <!-- ========================================================================
+         정리
+         ======================================================================== -->
+    <target name="clean" description="Clean build artifacts">
+        <delete dir="${classes.dir}"/>
+        <delete file="${dist.dir}/${fat.jar.name}"/>
+        <echo message="Clean completed"/>
+    </target>
+
+    <!-- ========================================================================
+         전체 재빌드 (clean + build)
+         ======================================================================== -->
+    <target name="rebuild" depends="clean,build" description="Clean and rebuild">
+        <echo message="Rebuild completed"/>
+    </target>
+
 </project>

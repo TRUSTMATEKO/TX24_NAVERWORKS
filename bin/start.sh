@@ -20,6 +20,11 @@ CONF_DIR="${BASE_DIR}/conf"
 LOG_DIR="${BASE_DIR}/logs"
 LIB_DIR="${BASE_DIR}/lib"
 CLASSES_DIR="${BASE_DIR}/classes"
+DIST_DIR="${BASE_DIR}/dist"
+
+# Fat JAR 설정 (기본 Production 모드)
+FAT_JAR_NAME="TX24_NAVERWORKS.jar"
+FAT_JAR="${DIST_DIR}/${FAT_JAR_NAME}"
 
 # PID 파일
 PID_FILE="${BIN_DIR}/${PROC_NAME}.pid"
@@ -63,7 +68,7 @@ NLB_CONFIG="${CONF_DIR}/nlb.json"
 # DB_CONFIG="${CONF_DIR}/db.json"
 
 #EXECUTOR_THRESHOLD_WARN="true"
-#EXECUTOR_THRESHOLD_MILLIES="5000""
+#EXECUTOR_THRESHOLD_MILLIES="5000"
 
 #==============================================================================
 # Java 설정
@@ -121,26 +126,41 @@ PRG_OPTS=""
 [ -n "$NLB_CONFIG" ] && PRG_OPTS="${PRG_OPTS} -DNLB=${NLB_CONFIG}"
 [ -n "$DB_CONFIG" ] && PRG_OPTS="${PRG_OPTS} -DDBSET=${DB_CONFIG}"
 
-# 설정 파일 옵션 Async 실행 지연에 대한 경고 적용 
+# Async Executor 옵션
 [ -n "$EXECUTOR_THRESHOLD_WARN" ] && PRG_OPTS="${PRG_OPTS} -Dasync.threshold.warn=${EXECUTOR_THRESHOLD_WARN}"
 [ -n "$EXECUTOR_THRESHOLD_MILLIES" ] && PRG_OPTS="${PRG_OPTS} -Dasync.threshold.millies=${EXECUTOR_THRESHOLD_MILLIES}"
 
-
-# AsyncExcutor 옵션
-
-
 #==============================================================================
-# Classpath 구성
+# 실행 모드 감지
 #==============================================================================
-CLASSPATH="${LIB_DIR}/*:${CLASSES_DIR}"
-
-
-
+detect_run_mode() {
+    # 기본은 production 모드
+    # Fat JAR 이름이 지정되어 있고 파일이 존재하면 production
+    if [ -n "$FAT_JAR_NAME" ] && [ -f "$FAT_JAR" ]; then
+        echo "production"
+    else
+        echo "development"
+    fi
+}
 
 #==============================================================================
 # 옵션 출력 함수
 #==============================================================================
 print_options() {
+    local run_mode
+    run_mode=$(detect_run_mode)
+    
+    echo ""
+    echo "TX24 NAVER WORKS Application"
+    echo "Run Mode: ${run_mode}"
+    
+    if [ "$run_mode" = "production" ]; then
+        echo "Executable: ${FAT_JAR}"
+    else
+        echo "Main Class: ${MAIN_CLASS}"
+        echo "Classpath: ${LIB_DIR}/*:${CLASSES_DIR}"
+    fi
+    
     echo ""
     echo "JVM Options:"
     if [ -n "$JVM_OPTS" ]; then
@@ -165,7 +185,6 @@ print_options() {
     echo ""
 }
 
-
 #==============================================================================
 # 프로세스 확인
 #==============================================================================
@@ -185,7 +204,7 @@ check_process() {
     fi
     
     # 실행 중인 프로세스 확인
-    local running_proc
+    local running_proc_count
     running_proc_count=$(ps -ef | grep "[j]ava" | grep -c "$PROC_NAME" || true)
     if [ "$running_proc_count" -gt 0 ]; then
         echo "Error: Process is already running"
@@ -198,21 +217,44 @@ check_process() {
 # 애플리케이션 시작
 #==============================================================================
 start_application() {
-    echo "Starting $PROC_NAME..."
+    local run_mode
+    run_mode=$(detect_run_mode)
+    
+    echo "Starting $PROC_NAME in ${run_mode} mode..."
+    echo ""
     
     cd "$BIN_DIR" || exit 1
     
-    $JAVA $PRG_OPTS $JVM_OPTS -cp "$CLASSPATH" $MAIN_CLASS &
-    local pid=$!
+    # Production Mode: Fat JAR 실행 (기본)
+    if [ "$run_mode" = "production" ]; then
+        echo "Executing: java -jar ${FAT_JAR}"
+        $JAVA $PRG_OPTS $JVM_OPTS -jar "$FAT_JAR" &
+        local pid=$!
+    # Development Mode: Classpath 실행 (Fallback)
+    else
+        echo "Warning: Fat JAR not found (${FAT_JAR})"
+        echo "Fallback to development mode"
+        echo "To build Fat JAR, run: ant build -Dproduction=true"
+        echo ""
+        
+        # Classpath 구성
+        CLASSPATH="${LIB_DIR}/*:${CLASSES_DIR}"
+        
+        echo "Executing: java -cp ${CLASSPATH} ${MAIN_CLASS}"
+        $JAVA $PRG_OPTS $JVM_OPTS -cp "$CLASSPATH" $MAIN_CLASS &
+        local pid=$!
+    fi
     
     echo "$pid" > "$PID_FILE"
     
     sleep 2
     if ps -p "$pid" > /dev/null 2>&1; then
+        echo ""
         echo "Started successfully (PID: $pid)"
         echo ""
         return 0
     else
+        echo ""
         echo "Failed to start"
         rm -f "$PID_FILE"
         return 1
@@ -223,13 +265,6 @@ start_application() {
 # Main
 #==============================================================================
 main() {
-    
-    # verbose 옵션 확인
-    #if [ "$1" = "-v" ] || [ "$1" = "--verbose" ]; then
-    #    print_options
-    #    shift
-    #fi
-    
     print_options
     
     check_process
