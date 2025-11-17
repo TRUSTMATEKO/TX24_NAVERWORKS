@@ -52,6 +52,8 @@ public class BotMessage {
     
     // Fluent Content Builders
     
+    
+    
     /**
      * 텍스트 메시지 설정
      */
